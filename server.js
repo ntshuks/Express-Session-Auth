@@ -64,20 +64,36 @@ app.post('/register', (req,res) => {
     .catch((err) => console.log(err)) 
      }); 
 
-// function findUser(email) {
-//     User.findOne({email: email})
-//     .then ((user) => {
-//         if(user) {}
-//     })
-//     console.log('user from function');
-//     console.log(user);
-//     return user;
-//    } catch (error) {
-//     // here assuming only error is that user is not found
-//     const user = '';
-//     return user;
-//    }
-// }
+app.post('/login', (req,res) => {
+    console.log('Got into the post route');
+    const email = req.body.email;
+    console.log(`Supplied email: ${email}`);
+    const plainPassword = req.body.password;
+    let msg;
+    //check to see if emial is registered
+    User.findOne({email: email})
+        .then((user) => {
+            if (!user) {
+                console.log(user);
+                msg = `Email: ${email} is not registered`;
+                res.render('login', {msg});
+            } else{
+                console.log('Comparing passwords')
+            bcrypt.compare(plainPassword,user.password, (err, result) =>{
+            if (err) throw err;
+            console.log(`Passwords math? ${result}`);
+            if (result) {
+                msg = `User with email: ${email} successfully logged In`;
+                res.render('secret', {msg});
+            } else {
+                msg = "passwords don not match";
+                res.render('login', {msg});
+            }
+        })
+        }      
+        })
+        .catch ((err) => console.log(err))
+    });
 
 app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}`);
