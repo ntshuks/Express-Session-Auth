@@ -43,7 +43,7 @@ app.use(session({
 }));
 
 // DB connection
-mongoose.connect(process.env.DB_URI)
+mongoose.connect(process.env.DB_URI, {useNewUrlParser: true,useUnifiedTopology: true,})
 .then(() => console.log('DB connected...'))
 .catch ((err) => console.log(err));
 
@@ -130,7 +130,6 @@ app.post('/login', (req,res) => {
     User.findOne({email: email})
         .then((user) => {
             if (!user) {
-                console.log(user);
               //  msg = `Email: ${email} is not registered`;
                 msg = 'Login Failed - incorrect credentials';
                 res.render('login', {msg});
@@ -138,10 +137,8 @@ app.post('/login', (req,res) => {
             // compare passwords
             bcrypt.compare(plainPassword,user.password, (err, result) =>{
             if (err) throw err;
-            console.log(`Passwords match? ${result}`);
             if (result) {
                 req.session.loggedIn=true;
-                console.log(req.session.loggedIn);
                 msg = `User with email: ${email} successfully logged In`;
                 res.redirect('/secret');
             } else {
